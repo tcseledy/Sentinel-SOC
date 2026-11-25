@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sentinel SOC</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header>
+    <h1>SENTINEL SOC</h1>
+    <p>Security Operations Center</p>
+    <span id="connection">Connecting...</span>
+</header>
+
+<main>
+    <section class="metrics">
+        <div class="card">
+            <h3>Total Alerts</h3>
+            <h2 id="total">0</h2>
+        </div>
+
+        <div class="card critical">
+            <h3>Critical</h3>
+            <h2 id="critical">0</h2>
+        </div>
+
+        <div class="card high">
+            <h3>High</h3>
+            <h2 id="high">0</h2>
+        </div>
+
+        <div class="card medium">
+            <h3>Medium</h3>
+            <h2 id="medium">0</h2>
+        </div>
+
+        <div class="card low">
+            <h3>Low</h3>
+            <h2 id="low">0</h2>
+        </div>
+
+        <div class="card">
+            <h3>Open Alerts</h3>
+            <h2 id="open">0</h2>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Security Alerts</h2>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Timestamp</th>
+                        <th>Source IP</th>
+                        <th>Destination IP</th>
+                        <th>Signature</th>
+                        <th>Original Severity</th>
+                        <th>Severity</th>
+                        <th>Related Alerts</th>
+                        <th>Priority</th>
+                        <th>Response</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="alerts"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+
+</body>
+</html>

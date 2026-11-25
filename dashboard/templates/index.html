@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sentinel SOC</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header>
+    <h1>SENTINEL SOC</h1>
+    <p>Security Operations Center</p>
+    <span id="connection">Connecting...</span>
+</header>
+
+<main>
+    <section class="metrics">
+        <div class="card">
+            <h3>Total Alerts</h3>
+            <h2 id="total">0</h2>
+        </div>
+
+        <div class="card critical">
+            <h3>Critical</h3>
+            <h2 id="critical">0</h2>
+        </div>
+
+        <div class="card high">
+            <h3>High</h3>
+            <h2 id="high">0</h2>
+        </div>
+
+        <div class="card medium">
+            <h3>Medium</h3>
+            <h2 id="medium">0</h2>
+        </div>
+
+        <div class="card low">
+            <h3>Low</h3>
+            <h2 id="low">0</h2>
+        </div>
+
+        <div class="card">
+            <h3>Open Alerts</h3>
+            <h2 id="open">0</h2>
+        </div>
+    </section>
+
+    
+
+
+<section class="panel analytics-card timeline-panel">
+    <div class="timeline-header">
+        <h2>Alert Activity Over Time</h2>
+
+        <select id="timeline-range">
+            <option value="1h">Last Hour</option>
+            <option value="24h" selected>Last 24 Hours</option>
+            <option value="7d">Last 7 Days</option>
+            <option value="30d">Last 30 Days</option>
+        </select>
+    </div>
+
+    <div id="timeline-summary"></div>
+    <div id="timeline-chart"></div>
+
+    <div class="timeline-legend">
+        <span></span> Security Alerts
+    </div>
+</section>
+
+<section class="soc-analytics-grid">
+
+    <div class="panel analytics-card">
+        <h2>Severity Distribution</h2>
+        <div id="severity-chart"></div>
+    </div>
+
+    <div class="panel analytics-card">
+        <h2>Threat Categories</h2>
+        <div id="threat-chart"></div>
+    </div>
+
+    <div class="panel analytics-card">
+        <h2>Top Source IPs</h2>
+        <div id="source-chart"></div>
+    </div>
+
+    <div class="panel analytics-card">
+        <h2>Incident Status</h2>
+        <div id="incident-chart"></div>
+    </div>
+
+</section>
+
+<section class="filters">
+    <input id="search" type="search"
+           placeholder="Search IP, signature, or alert ID...">
+
+    <select id="severity-filter">
+        <option value="All">All Severities</option>
+        <option value="Critical">Critical</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+        <option value="Unknown">Unknown</option>
+    </select>
+
+    <select id="status-filter">
+        <option value="All">All Statuses</option>
+        <option value="Open">Open</option>
+        <option value="Investigating">Investigating</option>
+        <option value="Resolved">Resolved</option>
+    </select>
+
+    <span id="result-count"></span>
+</section>
+
+<section class="panel">
+        <h2>Security Alerts</h2>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Timestamp</th>
+                        <th>Source IP</th>
+                        <th>Destination IP</th>
+                        <th>Signature</th>
+                        <th>Original Severity</th>
+                        <th>Severity</th>
+                        <th>Related Alerts</th>
+                        <th>Priority</th>
+                        <th>Response</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="alerts"></tbody>
+            </table>
+
+<div class="pagination">
+    <span id="pagination-info">Loading alerts...</span>
+
+    <div class="pagination-controls">
+        <select id="page-size">
+            <option value="15">15 per page</option>
+            <option value="30" selected>30 per page</option>
+            <option value="50">50 per page</option>
+            <option value="100">100 per page</option>
+        </select>
+
+        <button id="previous-page">Previous</button>
+
+        <span id="page-indicator">Page 1 of 1</span>
+
+        <button id="next-page">Next</button>
+    </div>
+</div>
+
+        </div>
+    </section>
+</main>
+
+
+<dialog id="investigation-panel">
+    <div class="investigation-header">
+        <div>
+            <div id="investigation-id"></div>
+            <h2 id="investigation-title">Alert Investigation</h2>
+        </div>
+
+        <button id="close-investigation"
+                aria-label="Close investigation">
+            &times;
+        </button>
+    </div>
+
+    <div id="investigation-content"></div>
+
+    <div class="investigation-footer">
+        <label for="investigation-status">
+            Investigation Status
+        </label>
+
+        <select id="investigation-status">
+            <option value="Open">Open</option>
+            <option value="Investigating">Investigating</option>
+            <option value="Resolved">Resolved</option>
+        </select>
+
+        <button id="save-investigation">
+            Save Status
+        </button>
+
+        <div id="investigation-message"
+             role="status"></div>
+    </div>
+</dialog>
+
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+
+</body>
+</html>
