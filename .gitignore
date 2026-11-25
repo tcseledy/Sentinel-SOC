@@ -1,0 +1,19 @@
+# Virtual environment
+.venv/
+
+# Credentials
+.env
+
+# Security logs
+logs/
+*.log
+
+# Python cache
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+*.bak
+*.mitre-backup

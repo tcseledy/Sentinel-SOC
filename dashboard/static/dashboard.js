@@ -1,4 +1,26 @@
 
+function formatAttackType(signature) {
+    const name = String(signature || "Unknown Alert");
+
+    const mappings = [
+        [/brute\s*force/i, "SSH Brute Force"],
+        [/syn flood/i, "SYN Flood"],
+        [/port scan/i, "Port Scan"],
+        [/arp spoof/i, "ARP Spoofing"],
+        [/ip spoof/i, "IP Spoofing"],
+        [/dns tunnel/i, "DNS Tunneling"],
+        [/sql injection/i, "SQL Injection"],
+        [/test/i, "Test Alert"]
+    ];
+
+    for (const [pattern, label] of mappings) {
+        if (pattern.test(name)) return label;
+    }
+
+    return name;
+}
+
+
 function renderThreatGraph(id, items, field, source = false) {
     const chart = document.getElementById(id);
     chart.replaceChildren();
@@ -115,7 +137,7 @@ function renderAlerts() {
         "source_ip",
         "destination_ip",
         "signature",
-        "original_severity",
+        "event_source", "original_severity",
         "severity",
         "related_alerts",
         "priority",
@@ -138,7 +160,7 @@ if (field === "id" || field === "signature") {
 
                 link.textContent = field === "id"
                     ? "#" + item.id
-                    : item.signature || "Unknown Alert";
+                    : formatAttackType(item.signature);
 
                 link.addEventListener("click", () => {
                     openInvestigation(item.id);
@@ -171,7 +193,7 @@ if (field === "id" || field === "signature") {
                 cell.appendChild(select);
 
             } else {
-                cell.textContent = item[field] ?? "N/A";
+                cell.textContent = item[field] ?? "Unknown/Other";
 
                 if (field === "severity") {
                     cell.className = String(
@@ -355,7 +377,7 @@ document.getElementById("status-filter")
 
 
 refreshDashboard();
-setInterval(refreshDashboard, 5000);
+setInterval(() => refreshDashboard(), 5000);
 
 function renderPieChart(id, items) {
     const container = document.getElementById(id);
@@ -552,7 +574,7 @@ function renderSOCAnalytics(data) {
     );
 
     const sources = data.top_sources.map(item => ({
-        label: item.source_ip,
+        label: (item.source_ip ?? "Unknown/Other"),
         total: item.total,
         color: "#38bdf8"
     }));
@@ -722,7 +744,7 @@ function renderSOCAnalytics(data) {
     );
 
     const sources = data.top_sources.map(item => ({
-        label: item.source_ip,
+        label: (item.source_ip ?? "Unknown/Other"),
         total: item.total,
         color: "#38bdf8"
     }));
@@ -984,7 +1006,7 @@ function investigationSection(title, fields, grid = true) {
 
         const text = document.createElement("div");
         text.className = "investigation-value";
-        text.textContent = value ?? "N/A";
+        text.textContent = value ?? "Unknown/Other";
 
         if (color) {
             text.style.color = color;
@@ -1184,3 +1206,192 @@ document.getElementById("investigation-panel")
 
 document.getElementById("save-investigation")
     .addEventListener("click", saveInvestigationStatus);
+
+/* Global Dashboard Filters */
+
+function advancedParameters() {
+    return new URLSearchParams({
+        range: document.getElementById("global-range").value,
+        page: currentPage,
+        limit: pageSize,
+        search: document.getElementById("search").value,
+        severity: document.getElementById("severity-filter").value,
+        status: document.getElementById("status-filter").value
+    });
+}
+
+loadAlertPage = async function () {
+    const requestId = ++pageRequest;
+
+    try {
+        const response = await fetch(
+            "/api/advanced/alerts?" + advancedParameters(),
+            {cache: "no-store"}
+        );
+
+        if (!response.ok) {
+            throw new Error("Advanced API failed");
+        }
+
+        const data = await response.json();
+
+        if (requestId !== pageRequest) return;
+
+        dashboardData = data;
+        currentPage = data.page;
+        totalPages = data.pages;
+
+        document.getElementById("total").textContent = data.total;
+
+        for (const level of [
+            "Critical", "High", "Medium", "Low"
+        ]) {
+            document.getElementById(
+                level.toLowerCase()
+            ).textContent = data.counts[level] || 0;
+        }
+
+        document.getElementById("open").textContent =
+            data.open_alerts;
+
+        renderSOCAnalytics(data);
+
+        const first = data.total
+            ? (currentPage - 1) * pageSize + 1 : 0;
+
+        const last = Math.min(
+            currentPage * pageSize, data.total
+        );
+
+        document.getElementById("pagination-info").textContent =
+            `Showing ${first}-${last} of ${data.total} alerts`;
+
+        document.getElementById("page-indicator").textContent =
+            `Page ${currentPage} of ${totalPages}`;
+
+        document.getElementById("result-count").textContent =
+            `${data.total} matching alerts`;
+
+        document.getElementById("previous-page").disabled =
+            currentPage <= 1;
+
+        document.getElementById("next-page").disabled =
+            currentPage >= totalPages;
+
+        if (!document.activeElement.matches(".status-select")) {
+            renderAlerts();
+        }
+
+        document.getElementById("connection").textContent =
+            "Database connected | Updated: " +
+            new Date().toLocaleTimeString();
+
+    } catch (error) {
+        document.getElementById("connection").textContent =
+            "Dashboard connection error";
+
+        console.error(error);
+    }
+};
+
+refreshDashboard = async function () {
+    if (updatingStatus || refreshing) return;
+
+    refreshing = true;
+
+    try {
+        await loadAlertPage();
+    } finally {
+        refreshing = false;
+    }
+};
+
+document.getElementById("global-range")
+    .addEventListener("change", () => {
+        currentPage = 1;
+
+        const range = document.getElementById("global-range").value;
+
+        if (range !== "all") {
+            document.getElementById("timeline-range").value = range;
+            loadTimeline();
+        }
+
+        loadAlertPage();
+    });
+
+loadAlertPage();
+
+document.getElementById("export-alerts")
+    .addEventListener("click", () => {
+        window.location.href =
+            "/api/alerts/export?" + advancedParameters();
+    });
+
+const originalMitreInvestigation = openInvestigation;
+
+openInvestigation = async function(id) {
+    await originalMitreInvestigation(id);
+
+    if (activeInvestigation !== id) return;
+
+    try {
+        const response = await fetch(`/api/alerts/${id}/mitre`);
+
+        if (!response.ok) {
+            throw new Error("MITRE classification unavailable");
+        }
+
+        const mitre = await response.json();
+
+        if (activeInvestigation !== id) return;
+
+        const content = document.getElementById(
+            "investigation-content"
+        );
+
+        const section = document.createElement("section");
+        section.className = "mitre-section";
+
+        const heading = document.createElement("h3");
+        heading.textContent = "MITRE ATT&CK Classification";
+        section.appendChild(heading);
+
+        const fields = [
+            ["Technique ID", mitre.technique || "Unknown/Other"],
+            ["Technique Name", mitre.name],
+            ["Tactic", mitre.tactic],
+            ["Confidence", mitre.confidence]
+        ];
+
+        for (const [label, value] of fields) {
+            const row = document.createElement("div");
+            row.className = "mitre-row";
+
+            const key = document.createElement("span");
+            key.textContent = label;
+
+            const result = document.createElement("strong");
+            result.textContent = value || "Unknown/Other";
+
+            row.append(key, result);
+            section.appendChild(row);
+        }
+
+        if (mitre.url) {
+            const link = document.createElement("a");
+            link.href = mitre.url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = "View MITRE ATT&CK Technique";
+            section.appendChild(link);
+        }
+
+        content.appendChild(section);
+
+    } catch (error) {
+        console.error("MITRE:", error);
+    }
+};
+
+

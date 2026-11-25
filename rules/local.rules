@@ -1,0 +1,1 @@
+alert icmp any any -> any any (msg:"Sentinel SOC Live ICMP Detection"; itype:8; sid:1000001; rev:1;)

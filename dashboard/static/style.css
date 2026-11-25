@@ -689,3 +689,138 @@ input, select {
     background-repeat: no-repeat;
     background-position: right 12px center;
 }
+
+.global-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    background: #111827;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 20px;
+}
+
+.global-controls label {
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+#global-range {
+    appearance: none;
+    background-color: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #475569;
+    border-radius: 6px;
+    padding: 10px 36px 10px 14px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%2394a3b8' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+#export-alerts {
+    margin-left: auto;
+    background: #0284c7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 11px 18px;
+    cursor: pointer;
+}
+
+#export-alerts:hover {
+    background: #0369a1;
+}
+
+.mitre-section {
+    background: #111827;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 18px;
+}
+
+.mitre-section h3 {
+    color: #e2e8f0;
+    font-size: 15px;
+    margin: 0 0 16px;
+}
+
+.mitre-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid #1e293b;
+}
+
+.mitre-row span {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.mitre-row strong {
+    color: #38bdf8;
+    font-size: 13px;
+    text-align: right;
+}
+
+.mitre-section a {
+    display: inline-block;
+    margin-top: 16px;
+    color: #38bdf8;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.mitre-section a:hover {
+    text-decoration: underline;
+}
+
+
+.mitre-section {
+    background: #111827;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 18px;
+    margin-top: 18px;
+}
+
+.mitre-section h3 {
+    color: #e2e8f0;
+    font-size: 15px;
+    margin: 0 0 16px;
+}
+
+.mitre-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid #1e293b;
+}
+
+.mitre-row span {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.mitre-row strong {
+    color: #38bdf8;
+    font-size: 13px;
+    text-align: right;
+}
+
+.mitre-section a {
+    display: inline-block;
+    margin-top: 16px;
+    color: #38bdf8;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.mitre-section a:hover {
+    text-decoration: underline;
+}
+

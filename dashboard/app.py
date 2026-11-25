@@ -3,6 +3,10 @@ from database.connection import get_connection
 
 app = Flask(__name__)
 
+from dashboard.advanced import advanced
+app.register_blueprint(advanced)
+
+
 
 def fetch_dashboard_data():
     connection = get_connection()
